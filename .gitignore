@@ -42,3 +42,4 @@ target/
 # Other
 *.swp
 *.lock
+pdfs/
