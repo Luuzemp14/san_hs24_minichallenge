@@ -42,7 +42,7 @@ def get_spearman_and_pearson_correlations(graph):
         paths.append(path)
         plt.figure(figsize=(6, 4))
         plt.scatter(data["Value"], data[centrality], alpha=0.7)
-        plt.title(f"Number of scenes the character appears in vs {centrality}")
+        plt.title(f"Appearance (Node Attribute) vs {centrality}")
         plt.xlabel("N")
         plt.ylabel(centrality)
         plt.grid(True)
