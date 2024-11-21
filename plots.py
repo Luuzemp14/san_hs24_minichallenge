@@ -1,3 +1,4 @@
+from community import community_louvain
 import matplotlib.pyplot as plt
 import networkx as nx
 import matplotlib.colors as mcolors
@@ -150,15 +151,28 @@ def plot_communities(G, communities, network_name):
 def calculate_node_sizes(G, size_by: str, scaling_factor: float = 1.0):
     """Calculate node sizes based on different centrality measures"""
     if size_by == "value":
-        return {node: G.nodes[node]["value"] * 50 * scaling_factor for node in G.nodes()}
+        return {
+            node: G.nodes[node]["value"] * 50 * scaling_factor for node in G.nodes()
+        }
     elif size_by == "degree":
-        return {node: deg * 50 * scaling_factor for node, deg in dict(G.degree()).items()}
+        return {
+            node: deg * 50 * scaling_factor for node, deg in dict(G.degree()).items()
+        }
     elif size_by == "closeness":
-        return {node: val * 5000 * scaling_factor for node, val in nx.closeness_centrality(G).items()}
+        return {
+            node: val * 5000 * scaling_factor
+            for node, val in nx.closeness_centrality(G).items()
+        }
     elif size_by == "betweenness":
-        return {node: val * 10000 * scaling_factor for node, val in nx.betweenness_centrality(G).items()}
+        return {
+            node: val * 10000 * scaling_factor
+            for node, val in nx.betweenness_centrality(G).items()
+        }
     elif size_by == "eigenvector":
-        return {node: val * 1000 * scaling_factor for node, val in nx.eigenvector_centrality(G).items()}
+        return {
+            node: val * 1000 * scaling_factor
+            for node, val in nx.eigenvector_centrality(G).items()
+        }
     else:
         raise ValueError(f"Unknown size_by parameter: {size_by}")
 
@@ -174,9 +188,14 @@ def plot_node_size(G, layout_name: str, node_size: int = 1, size_by: str = "valu
     plt.title(f"Star Wars Interactions Network - {layout_name}\nSize by: {size_by}")
 
     try:
-        if layout_name in ["forceatlas2_layout", "rescale_layout", "rescale_layout_dict", "arf_layout"]:
+        if layout_name in [
+            "forceatlas2_layout",
+            "rescale_layout",
+            "rescale_layout_dict",
+            "arf_layout",
+        ]:
             return
-            
+
         node_sizes = calculate_node_sizes(G, size_by, node_size)
 
         layout_func = getattr(nx, layout_name)
@@ -194,7 +213,9 @@ def plot_node_size(G, layout_name: str, node_size: int = 1, size_by: str = "valu
         )
 
         plt.tight_layout()
-        plt.savefig(f"plots/node_size/{size_by}/{layout_name}.png", dpi=300, bbox_inches="tight")
+        plt.savefig(
+            f"plots/node_size/{size_by}/{layout_name}.png", dpi=300, bbox_inches="tight"
+        )
         plt.close()
 
     except Exception as e:
@@ -202,7 +223,9 @@ def plot_node_size(G, layout_name: str, node_size: int = 1, size_by: str = "valu
         plt.close()
 
 
-def plot_edge_weight(G, layout_name: str, node_size: int = 0, edge_weight: bool = False):
+def plot_edge_weight(
+    G, layout_name: str, node_size: int = 0, edge_weight: bool = False
+):
     os.makedirs("plots/edge_weight", exist_ok=True)
 
     plt.figure(figsize=(12, 8))
@@ -221,7 +244,9 @@ def plot_edge_weight(G, layout_name: str, node_size: int = 0, edge_weight: bool 
 
         if edge_weight:
             edge_weights = [G[u][v]["weight"] / 5 for u, v in G.edges()]
-            nx.draw_networkx_edges(G, pos, width=edge_weights, edge_color="gray", alpha=0.5)
+            nx.draw_networkx_edges(
+                G, pos, width=edge_weights, edge_color="gray", alpha=0.5
+            )
 
             nx.draw_networkx_nodes(
                 G,
@@ -237,7 +262,9 @@ def plot_edge_weight(G, layout_name: str, node_size: int = 0, edge_weight: bool 
                     G,
                     pos=pos,
                     node_color="lightblue",
-                    node_size=[G.nodes[node]["value"] * node_size for node in G.nodes()],
+                    node_size=[
+                        G.nodes[node]["value"] * node_size for node in G.nodes()
+                    ],
                     with_labels=True,
                     font_size=8,
                     edge_color="gray",
@@ -255,108 +282,128 @@ def plot_edge_weight(G, layout_name: str, node_size: int = 0, edge_weight: bool 
                 )
 
         plt.tight_layout()
-        plt.savefig(f"plots/edge_weight/{layout_name}.png", dpi=300, bbox_inches="tight")
+        plt.savefig(
+            f"plots/edge_weight/{layout_name}.png", dpi=300, bbox_inches="tight"
+        )
         plt.close()
 
     except Exception as e:
         print(f"Error plotting {layout_name}: {str(e)}")
 
 
-def plot_community_with_layout(G, layout_name: str, communities, community_type: str, size_by: str = "value"):
+def create_community_node_colors(graph, communities):
+    number_of_colors = len(communities)
+    colors = ["#D4FCB1", "#CDC5FC", "#FFC2C4", "#F2D140", "#BCC6C8"][:number_of_colors]
+    node_colors = []
+    for node in graph:
+        current_community_index = 0
+        for community in communities:
+            if node in community:
+                node_colors.append(colors[current_community_index])
+                break
+            current_community_index += 1
+    return node_colors
+
+
+import networkx as nx
+import matplotlib.pyplot as plt
+from networkx.algorithms.community import girvan_newman
+
+
+def plot_girvan_newman_communities(graph, layout="spring_layout", level=1):
     """
-    Plot communities with node sizes based on different centrality measures
-    size_by options: 'value', 'degree', 'closeness', 'betweenness', 'eigenvector'
+    Detects and plots Girvan-Newman communities for a given graph using the specified layout.
+
+    Parameters:
+        graph (networkx.Graph): The graph to analyze and plot.
+        layout (str): The layout to use for positioning nodes. Options: "circular_layout",
+                      "kamada_kawai_layout", "random_layout", "shell_layout",
+                      "spring_layout", "fruchterman_reingold_layout".
+        level (int): The level of the hierarchy to extract communities (higher levels = fewer communities).
     """
-    os.makedirs(f"plots/communities/{size_by}", exist_ok=True)
-    
-    plt.figure(figsize=(12, 8))
-    plt.title(f"Communities using {community_type}\nLayout: {layout_name}\nSize by: {size_by}")
+    LAYOUTS = [
+        "circular_layout",
+        "kamada_kawai_layout",
+        "random_layout",
+        "shell_layout",
+        "spring_layout",
+        "fruchterman_reingold_layout",
+    ]
 
-    try:
-        if layout_name in ["forceatlas2_layout", "rescale_layout", "rescale_layout_dict", "arf_layout",
-                          "bipartite_layout", "bfs_layout", "multipartite_layout", "planar_layout"]:
-            return
-        
-        # Calculate node sizes based on selected centrality measure
-        if size_by == "value":
-            node_sizes = {node: G.nodes[node]["value"] * 50 for node in G.nodes()}
-        elif size_by == "degree":
-            node_sizes = {node: deg * 50 for node, deg in dict(G.degree()).items()}
-        elif size_by == "closeness":
-            node_sizes = {node: val * 5000 for node, val in nx.closeness_centrality(G).items()}
-        elif size_by == "betweenness":
-            node_sizes = {node: val * 100 for node, val in nx.betweenness_centrality(G).items()}
-        elif size_by == "eigenvector":
-            node_sizes = {node: val * 1000 for node, val in nx.eigenvector_centrality(G).items()}
-        else:
-            raise ValueError(f"Unknown size_by parameter: {size_by}")
+    if layout not in LAYOUTS:
+        raise ValueError(f"Invalid layout. Choose from: {', '.join(LAYOUTS)}")
 
-        layout_func = getattr(nx, layout_name)
-        try:
-            pos = layout_func(G)
-        except Exception as e:
-            print(f"Error computing {layout_name} layout: {str(e)}")
-            return
+    # Detect Girvan-Newman communities
+    communities_generator = girvan_newman(graph)
+    for _ in range(level - 1):  # Skip levels until the desired one
+        next(communities_generator)
+    communities = next(communities_generator)
+    community_mapping = {
+        node: i for i, community in enumerate(communities) for node in community
+    }
 
-        colors = list(mcolors.TABLEAU_COLORS.values())
-        if len(communities) > len(colors):
-            colors = plt.cm.tab20(np.linspace(0, 1, len(communities)))
+    # Assign colors based on communities
+    colors = [community_mapping[node] for node in graph.nodes()]
 
-        color_map = {}
-        for i, community in enumerate(communities):
-            for node in community:
-                color_map[node] = colors[i % len(colors)]
+    # Get layout positions
+    layout_function = getattr(nx, layout)
+    pos = layout_function(graph)
 
-        nx.draw_networkx_edges(
-            G,
-            pos,
-            width=[G[u][v]["weight"] / 5 for u, v in G.edges()],
-            edge_color="gray",
-            alpha=0.3
-        )
+    # Plot the graph
+    plt.figure(figsize=(10, 8))
+    nx.draw(
+        graph,
+        pos,
+        node_color=colors,
+        with_labels=True,
+        node_size=500,
+        cmap=plt.cm.tab10,
+    )
+    plt.title(f"Girvan-Newman Communities ({layout}, Level {level})")
+    plt.show()
 
-        nx.draw_networkx_nodes(
-            G,
-            pos,
-            node_size=[node_sizes[node] for node in G.nodes()],
-            node_color=[color_map[node] for node in G.nodes()],
-            alpha=0.7
-        )
 
-        nx.draw_networkx_labels(
-            G,
-            pos,
-            font_size=8,
-            font_weight="bold",
-            bbox=dict(facecolor="white", edgecolor="none", alpha=0.7, pad=0.5)
-        )
+def plot_louvain_communities(graph, layout="spring_layout"):
+    """
+    Detects and plots Louvain communities for a given graph using the specified layout.
 
-        legend_elements = [
-            plt.Line2D(
-                [0],
-                [0],
-                marker="o",
-                color="w",
-                markerfacecolor=colors[i % len(colors)],
-                label=f"Community {i+1}",
-                markersize=10,
-            )
-            for i in range(len(communities))
-        ]
-        plt.legend(
-            handles=legend_elements,
-            loc="center left",
-            bbox_to_anchor=(1, 0.5)
-        )
+    Parameters:
+        graph (networkx.Graph): The graph to analyze and plot.
+        layout (str): The layout to use for positioning nodes. Options: "circular_layout",
+                      "kamada_kawai_layout", "random_layout", "shell_layout",
+                      "spring_layout", "fruchterman_reingold_layout".
+    """
+    LAYOUTS = [
+        "circular_layout",
+        "kamada_kawai_layout",
+        "random_layout",
+        "shell_layout",
+        "spring_layout",
+        "fruchterman_reingold_layout",
+    ]
 
-        plt.tight_layout()
-        plt.savefig(
-            f"plots/communities/{size_by}/{community_type}_{layout_name}.png",
-            dpi=300,
-            bbox_inches="tight"
-        )
-        plt.close()
+    if layout not in LAYOUTS:
+        raise ValueError(f"Invalid layout. Choose from: {', '.join(LAYOUTS)}")
 
-    except Exception as e:
-        print(f"Error plotting {layout_name} for {community_type}: {str(e)}")
-        plt.close()
+    # Detect Louvain communities
+    partition = community_louvain.best_partition(graph)
+
+    # Assign colors based on communities
+    colors = [partition[node] for node in graph.nodes()]
+
+    # Get layout positions
+    layout_function = getattr(nx, layout)
+    pos = layout_function(graph)
+
+    # Plot the graph
+    plt.figure(figsize=(10, 8))
+    nx.draw(
+        graph,
+        pos,
+        node_color=colors,
+        with_labels=True,
+        node_size=500,
+        cmap=plt.cm.viridis,
+    )
+    plt.title(f"Louvain Communities ({layout})")
+    plt.show()

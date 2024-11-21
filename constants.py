@@ -1,30 +1,19 @@
 LAYOUTS = [
-    "bipartite_layout",
     "circular_layout",
-    "forceatlas2_layout",
     "kamada_kawai_layout",
     "random_layout",
-    "rescale_layout",
-    "rescale_layout_dict",
     "shell_layout",
     "spring_layout",
-    "planar_layout",
     "fruchterman_reingold_layout",
-    "spiral_layout",
-    "multipartite_layout",
-    "bfs_layout",
-    "arf_layout",
 ]
 
 COMMUNITY_DETECTIONS = [
-    "kernighan_lin_bisection",
     "edge_betweenness_partition",
-    "edge_current_flow_betweenness_partition",
     "k_clique_communities",
     "greedy_modularity_communities",
-    #"naive_greedy_modularity_communities",
-    #"lukes_partitioning",
-    "asyn_lpa_communities",
     "label_propagation_communities",
-    "fast_label_propagation_communities",
+    "louvain_communities",
+    "girvan_newman"
 ]
+
+CENTRALITY_MEASURES = ["value", "degree", "closeness", "betweenness", "eigenvector"]
