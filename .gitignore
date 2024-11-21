@@ -43,3 +43,4 @@ target/
 *.swp
 *.lock
 pdfs/
+plots/
