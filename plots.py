@@ -4,6 +4,8 @@ import networkx as nx
 import matplotlib.colors as mcolors
 import numpy as np
 import os
+from typing import List
+import utils
 
 
 def plot_networks(G_interactions, G_mentions):
@@ -406,4 +408,46 @@ def plot_louvain_communities(graph, layout="spring_layout"):
         cmap=plt.cm.viridis,
     )
     plt.title(f"Louvain Communities ({layout})")
+    plt.show()
+
+
+def plot_centrality_over_time(G: nx.Graph, interaction_files: List[str], centrality_type: str = "degree"):
+    rows, cols = 3, 3  # 4x3 grid
+    fig, axes = plt.subplots(rows, cols, figsize=(20, 15))
+
+    # Flatten axes for easier iteration
+    axes = axes.flatten()
+
+    for i, file in enumerate(interaction_files):
+        if i >= len(axes):
+            break  # Avoid plotting more than the grid allows
+        
+        # Load graph and calculate top degree centrality nodes
+        G = utils.get_graph_with_nodes_and_edges(nx.Graph(), utils.load_json(f"data/{file}"))
+        episode = file.split("-")[2]
+        if centrality_type == "degree":
+            top_nodes = sorted(nx.degree_centrality(G).items(), key=lambda x: -x[1])[:3]
+        elif centrality_type == "closeness":
+            top_nodes = sorted(nx.closeness_centrality(G).items(), key=lambda x: -x[1])[:3]
+        elif centrality_type == "betweenness":
+            top_nodes = sorted(nx.betweenness_centrality(G).items(), key=lambda x: -x[1])[:3]
+        else:
+            raise ValueError(f"Unknown centrality type: {centrality_type}")
+
+        # Prepare data for bar chart
+        nodes, values = zip(*top_nodes)
+
+        # Plot in the respective subplot
+        axes[i].bar(nodes, values)
+        axes[i].set_title(f"Episode {episode}")
+        axes[i].set_ylabel(centrality_type.capitalize())
+        axes[i].set_xlabel("Node")
+        axes[i].tick_params(axis='x', rotation=45)
+
+    # Hide unused subplots if interaction_files < 12
+    for j in range(i + 1, len(axes)):
+        axes[j].axis("off")
+
+    # Adjust layout
+    plt.tight_layout()
     plt.show()

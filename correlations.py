@@ -4,7 +4,7 @@ import pandas as pd
 from scipy.stats import pearsonr, spearmanr
 import matplotlib.pyplot as plt
 import os
-
+    
 def get_spearman_and_pearson_correlations(graph):
     """
     Analyze the correlation between node 'value' attribute and centrality measures of a graph.
