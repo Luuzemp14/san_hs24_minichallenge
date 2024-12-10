@@ -412,20 +412,15 @@ def plot_louvain_communities(graph, layout="spring_layout"):
     plt.show()
 
 
-def plot_centrality_over_time(
-    G: nx.Graph, interaction_files: List[str], centrality_type: str = "degree"
-):
+def plot_centrality_over_time(files: List[str], centrality_type: str = "degree"):
     rows, cols = 3, 3  # 4x3 grid
     fig, axes = plt.subplots(rows, cols, figsize=(20, 15))
-
-    # Flatten axes for easier iteration
     axes = axes.flatten()
 
-    for i, file in enumerate(interaction_files):
+    for i, file in enumerate(files):
         if i >= len(axes):
             break  # Avoid plotting more than the grid allows
 
-        # Load graph and calculate top degree centrality nodes
         G = utils.get_graph_with_nodes_and_edges(
             nx.Graph(), utils.load_json(f"data/{file}")
         )
@@ -442,74 +437,131 @@ def plot_centrality_over_time(
             )[:3]
         else:
             raise ValueError(f"Unknown centrality type: {centrality_type}")
-
-        # Prepare data for bar chart
         nodes, values = zip(*top_nodes)
-
-        # Plot in the respective subplot
         axes[i].bar(nodes, values)
         axes[i].set_title(f"Episode {episode}")
         axes[i].set_ylabel(centrality_type.capitalize())
         axes[i].set_xlabel("Node")
         axes[i].tick_params(axis="x", rotation=45)
 
-    # Hide unused subplots if interaction_files < 12
     for j in range(i + 1, len(axes)):
         axes[j].axis("off")
 
-    # Adjust layout
+    plt.tight_layout()
+    plt.show()
+
+
+def plot_centrality(file: str, centrality_type: str = "degree", top_n: int = 3):
+    G = utils.get_graph_with_nodes_and_edges(
+        nx.Graph(), utils.load_json(f"data/{file}")
+    )
+    if centrality_type == "degree":
+        centrality_dict = nx.degree_centrality(G)
+    elif centrality_type == "closeness":
+        centrality_dict = nx.closeness_centrality(G)
+    elif centrality_type == "betweenness":
+        centrality_dict = nx.betweenness_centrality(G)
+    else:
+        raise ValueError(f"Unknown centrality type: {centrality_type}")
+
+    top_nodes = sorted(centrality_dict.items(), key=lambda x: -x[1])[:top_n]
+    nodes, values = zip(*top_nodes)
+    plt.figure(figsize=(12, 6))
+    plt.bar(nodes, values)
+    episode = file.split("-")[2]
+    plt.title(
+        f"Top {top_n} Characters by {centrality_type.capitalize()} Centrality - {file}"
+    )
+    plt.ylabel(f"{centrality_type.capitalize()} Centrality")
+    plt.xlabel("Character")
+    plt.xticks(rotation=45, ha="right")
+
+    plt.tight_layout()
+    plt.show()
+
+
+def plot_centralities(file: str, top_n: int = 3):
+    fig, axes = plt.subplots(1, 3, figsize=(18, 6))
+
+    G = utils.get_graph_with_nodes_and_edges(
+        nx.Graph(), utils.load_json(f"data/{file}")
+    )
+
+    centrality_types = ["degree", "closeness", "betweenness"]
+
+    for i, centrality_type in enumerate(centrality_types):
+        if centrality_type == "degree":
+            centrality_dict = nx.degree_centrality(G)
+        elif centrality_type == "closeness":
+            centrality_dict = nx.closeness_centrality(G)
+        else:
+            centrality_dict = nx.betweenness_centrality(G)
+
+        top_nodes = sorted(centrality_dict.items(), key=lambda x: -x[1])[:top_n]
+        nodes, values = zip(*top_nodes)
+        axes[i].bar(nodes, values)
+        axes[i].set_title(f"{centrality_type.capitalize()} Centrality")
+        axes[i].tick_params(axis="x", rotation=45)
+
+    plt.suptitle(f"Top {top_n} Characters by Different Centrality Measures - {file}")
     plt.tight_layout()
     plt.show()
 
 
 def plot_actor_appearances():
     # Read the JSON file
-    with open('main_actors.json', 'r') as f:
+    with open("main_actors.json", "r") as f:
         data = json.load(f)
-    
+
     # Create a dictionary to store actor appearances
     actor_appearances = defaultdict(list)
-    
+
     # Process the data
     for episode_num, episode_data in data.items():
-        for actor_info in episode_data['main_actors']:
-            actor_appearances[actor_info['actor']].append({
-                'episode': episode_data['title'],
-                'role': actor_info['role']
-            })
-    
+        for actor_info in episode_data["main_actors"]:
+            actor_appearances[actor_info["actor"]].append(
+                {"episode": episode_data["title"], "role": actor_info["role"]}
+            )
+
     # Create figure
     plt.figure(figsize=(12, 6))
-    
+
     # Create a list of unique episodes and actors
     episodes = [f"Episode {i}: {data[str(i)]['title']}" for i in range(1, 8)]
     # Modified to include role in the actor labels
-    actors = [f"{actor} ({actor_appearances[actor][0]['role']})" for actor in actor_appearances.keys()]
-    
+    actors = [
+        f"{actor} ({actor_appearances[actor][0]['role']})"
+        for actor in actor_appearances.keys()
+    ]
+
     # Create a matrix of appearances
     appearance_matrix = np.zeros((len(actors), len(episodes)))
-    
+
     # Fill the matrix
     for i, actor in enumerate(actors):
-        actor_name = actor.split(' (')[0]  # Extract just the actor name without role
+        actor_name = actor.split(" (")[0]  # Extract just the actor name without role
         for appearance in actor_appearances[actor_name]:
-            j = next(idx for idx, ep in enumerate(episodes) if appearance['episode'] in ep)
+            j = next(
+                idx for idx, ep in enumerate(episodes) if appearance["episode"] in ep
+            )
             appearance_matrix[i, j] = 1
-    
+
     # Create heatmap
-    sns.heatmap(appearance_matrix, 
-                xticklabels=episodes,
-                yticklabels=actors,
-                cmap='YlOrRd',
-                cbar=False)
-    
-    plt.title('Star Wars Main Actors Appearances Across Episodes')
-    plt.xticks(rotation=45, ha='right')
+    sns.heatmap(
+        appearance_matrix,
+        xticklabels=episodes,
+        yticklabels=actors,
+        cmap="YlOrRd",
+        cbar=False,
+    )
+
+    plt.title("Star Wars Main Actors Appearances Across Episodes")
+    plt.xticks(rotation=45, ha="right")
     plt.tight_layout()
-    
+
     return plt
 
-# Example usage:
+
 if __name__ == "__main__":
-    plot = plot_actor_appearances()
-    plot.show()
+    interactions_all = "starwars-full-interactions.json"
+    plot_centrality(interactions_all, centrality_type="closeness")
