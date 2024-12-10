@@ -1,3 +1,6 @@
+import networkx as nx
+import matplotlib.pyplot as plt
+from networkx.algorithms.community import girvan_newman
 from community import community_louvain
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -307,11 +310,6 @@ def create_community_node_colors(graph, communities):
     return node_colors
 
 
-import networkx as nx
-import matplotlib.pyplot as plt
-from networkx.algorithms.community import girvan_newman
-
-
 def plot_girvan_newman_communities(graph, layout="spring_layout", level=1):
     """
     Detects and plots Girvan-Newman communities for a given graph using the specified layout.
@@ -411,7 +409,9 @@ def plot_louvain_communities(graph, layout="spring_layout"):
     plt.show()
 
 
-def plot_centrality_over_time(G: nx.Graph, interaction_files: List[str], centrality_type: str = "degree"):
+def plot_centrality_over_time(
+    G: nx.Graph, interaction_files: List[str], centrality_type: str = "degree"
+):
     rows, cols = 3, 3  # 4x3 grid
     fig, axes = plt.subplots(rows, cols, figsize=(20, 15))
 
@@ -421,16 +421,22 @@ def plot_centrality_over_time(G: nx.Graph, interaction_files: List[str], central
     for i, file in enumerate(interaction_files):
         if i >= len(axes):
             break  # Avoid plotting more than the grid allows
-        
+
         # Load graph and calculate top degree centrality nodes
-        G = utils.get_graph_with_nodes_and_edges(nx.Graph(), utils.load_json(f"data/{file}"))
+        G = utils.get_graph_with_nodes_and_edges(
+            nx.Graph(), utils.load_json(f"data/{file}")
+        )
         episode = file.split("-")[2]
         if centrality_type == "degree":
             top_nodes = sorted(nx.degree_centrality(G).items(), key=lambda x: -x[1])[:3]
         elif centrality_type == "closeness":
-            top_nodes = sorted(nx.closeness_centrality(G).items(), key=lambda x: -x[1])[:3]
+            top_nodes = sorted(nx.closeness_centrality(G).items(), key=lambda x: -x[1])[
+                :3
+            ]
         elif centrality_type == "betweenness":
-            top_nodes = sorted(nx.betweenness_centrality(G).items(), key=lambda x: -x[1])[:3]
+            top_nodes = sorted(
+                nx.betweenness_centrality(G).items(), key=lambda x: -x[1]
+            )[:3]
         else:
             raise ValueError(f"Unknown centrality type: {centrality_type}")
 
@@ -442,7 +448,7 @@ def plot_centrality_over_time(G: nx.Graph, interaction_files: List[str], central
         axes[i].set_title(f"Episode {episode}")
         axes[i].set_ylabel(centrality_type.capitalize())
         axes[i].set_xlabel("Node")
-        axes[i].tick_params(axis='x', rotation=45)
+        axes[i].tick_params(axis="x", rotation=45)
 
     # Hide unused subplots if interaction_files < 12
     for j in range(i + 1, len(axes)):
