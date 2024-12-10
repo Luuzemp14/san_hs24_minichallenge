@@ -1,0 +1,43 @@
+{
+  "1": {
+    "title": "The Phantom Menace",
+    "main_actors": [
+      { "actor": "Liam Neeson", "role": "Qui-Gon Jinn" },
+      { "actor": "Ewan McGregor", "role": "Obi-Wan Kenobi" },
+      { "actor": "Jake Lloyd", "role": "Anakin Skywalker" }
+    ]
+  },
+  "2": {
+    "title": "Attack of the Clones",
+    "main_actors": [
+      { "actor": "Hayden Christensen", "role": "Anakin Skywalker" },
+      { "actor": "Ewan McGregor", "role": "Obi-Wan Kenobi" }
+    ]
+  },
+  "3": {
+    "title": "Revenge of the Sith",
+    "main_actors": [
+      {
+        "actor": "Hayden Christensen",
+        "role": "Anakin Skywalker / Darth Vader"
+      },
+      { "actor": "Ewan McGregor", "role": "Obi-Wan Kenobi" }
+    ]
+  },
+  "4": {
+    "title": "A New Hope",
+    "main_actors": [{ "actor": "Mark Hamill", "role": "Luke Skywalker" }]
+  },
+  "5": {
+    "title": "The Empire Strikes Back",
+    "main_actors": [{ "actor": "Mark Hamill", "role": "Luke Skywalker" }]
+  },
+  "6": {
+    "title": "Return of the Jedi",
+    "main_actors": [{ "actor": "Mark Hamill", "role": "Luke Skywalker" }]
+  },
+  "7": {
+    "title": "The Force Awakens",
+    "main_actors": [{ "actor": "Daisy Ridley", "role": "Rey" }]
+  }
+}

@@ -9,6 +9,9 @@ import numpy as np
 import os
 from typing import List
 import utils
+import json
+import seaborn as sns
+from collections import defaultdict
 
 
 def plot_networks(G_interactions, G_mentions):
@@ -457,3 +460,56 @@ def plot_centrality_over_time(
     # Adjust layout
     plt.tight_layout()
     plt.show()
+
+
+def plot_actor_appearances():
+    # Read the JSON file
+    with open('main_actors.json', 'r') as f:
+        data = json.load(f)
+    
+    # Create a dictionary to store actor appearances
+    actor_appearances = defaultdict(list)
+    
+    # Process the data
+    for episode_num, episode_data in data.items():
+        for actor_info in episode_data['main_actors']:
+            actor_appearances[actor_info['actor']].append({
+                'episode': episode_data['title'],
+                'role': actor_info['role']
+            })
+    
+    # Create figure
+    plt.figure(figsize=(12, 6))
+    
+    # Create a list of unique episodes and actors
+    episodes = [f"Episode {i}: {data[str(i)]['title']}" for i in range(1, 8)]
+    # Modified to include role in the actor labels
+    actors = [f"{actor} ({actor_appearances[actor][0]['role']})" for actor in actor_appearances.keys()]
+    
+    # Create a matrix of appearances
+    appearance_matrix = np.zeros((len(actors), len(episodes)))
+    
+    # Fill the matrix
+    for i, actor in enumerate(actors):
+        actor_name = actor.split(' (')[0]  # Extract just the actor name without role
+        for appearance in actor_appearances[actor_name]:
+            j = next(idx for idx, ep in enumerate(episodes) if appearance['episode'] in ep)
+            appearance_matrix[i, j] = 1
+    
+    # Create heatmap
+    sns.heatmap(appearance_matrix, 
+                xticklabels=episodes,
+                yticklabels=actors,
+                cmap='YlOrRd',
+                cbar=False)
+    
+    plt.title('Star Wars Main Actors Appearances Across Episodes')
+    plt.xticks(rotation=45, ha='right')
+    plt.tight_layout()
+    
+    return plt
+
+# Example usage:
+if __name__ == "__main__":
+    plot = plot_actor_appearances()
+    plot.show()
