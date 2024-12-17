@@ -1,5 +1,14 @@
-import networkx as nx
+import communities
+import importance
+import os
+import json
+import seaborn as sns
+import numpy as np
 import matplotlib.pyplot as plt
+import networkx as nx
+import matplotlib.colors as mcolors
+from typing import List, Tuple
+from collections import defaultdict
 from networkx.algorithms.community import girvan_newman
 from community import community_louvain
 import matplotlib.pyplot as plt
@@ -562,6 +571,82 @@ def plot_actor_appearances():
     return plt
 
 
+def plot_top_nodes(top_nodes, title, ax=None):
+    if ax is None:
+        fig, ax = plt.subplots(figsize=(12, 6))
+
+    nodes, values = zip(*top_nodes)
+    ax.bar(nodes, values)
+    ax.set_title(title)
+    ax.set_ylabel("Betweenness Centrality")
+    ax.set_xlabel("Character")
+    ax.tick_params(axis="x", rotation=45)
+
+    return ax
+
+
+def plot_top_nodes_by_community(file_path, centrality_type="betweenness", top_n=3):
+    G_interactions = utils.get_graph_from_file(file_path)
+    communities_list = communities.get_louvain_communities(G_interactions)
+
+    fig, axes = plt.subplots(2, 3, figsize=(18, 12))
+    axes = axes.flatten()
+    plt.suptitle(
+        f"Top {top_n} Nodes by {centrality_type.capitalize()} Centrality for Each Community"
+    )
+
+    for idx, community in enumerate(communities_list):
+        G_community = G_interactions.subgraph(community)
+        top_nodes = importance.get_top_nodes_by_graph(
+            G_community, centrality_type=centrality_type, top_n=top_n
+        )
+        axes[idx] = plot_top_nodes(top_nodes, f"Community {idx+1}", ax=axes[idx])
+
+    for idx in range(len(communities_list), len(axes)):
+        axes[idx].set_visible(False)
+
+    plt.tight_layout()
+    plt.show()
+
+
+def plot_louvain_communities(file_path):
+    G = utils.get_graph_from_file(file_path)
+    louvain_communities_result = communities.get_louvain_communities(G)
+    num_louvain_communities = len(louvain_communities_result)
+    distinct_colors = [
+        plt.cm.tab20(i / num_louvain_communities)
+        for i in range(num_louvain_communities)
+    ]
+    rows, cols = 2, 3
+    fig, axes = plt.subplots(rows, cols, figsize=(16, 10))
+    axes = axes.flatten()
+    for i, community in enumerate(louvain_communities_result):
+        if i >= rows * cols:
+            break
+        subgraph = G.subgraph(community)
+        pos_subgraph = nx.spring_layout(subgraph, seed=42, k=3)
+        ax = axes[i]
+        nx.draw_networkx_nodes(
+            subgraph,
+            pos_subgraph,
+            node_color=[distinct_colors[i]] * len(subgraph),
+            node_size=100,
+            alpha=0.9,
+            ax=ax,
+        )
+        nx.draw_networkx_edges(subgraph, pos_subgraph, alpha=0.5, ax=ax)
+        nx.draw_networkx_labels(
+            subgraph, pos_subgraph, font_size=8, font_color="black", ax=ax
+        )
+        ax.set_title(f"Community {i + 1}", fontsize=12)
+        ax.axis("off")
+
+    for j in range(i + 1, len(axes)):
+        axes[j].axis("off")
+
+    plt.tight_layout()
+    plt.show()
+
+
 if __name__ == "__main__":
-    interactions_all = "starwars-full-interactions.json"
-    plot_centrality(interactions_all, centrality_type="closeness")
+    plot_louvain_communities("starwars-full-interactions-allCharacters.json")

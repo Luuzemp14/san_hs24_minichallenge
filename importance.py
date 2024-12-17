@@ -47,11 +47,12 @@ def get_top_nodes_by_graph(
         raise ValueError(f"Unknown centrality type: {centrality_type}")
 
 
+def get_top_nodes_by_community(
+    G: nx.Graph, community: List[str], centrality_type: str = "degree", top_n: int = 3
+):
+    G_community = G.subgraph(community)
+    return get_top_nodes_by_graph(G_community, centrality_type, top_n)
+
+
 if __name__ == "__main__":
-    interaction_files = [
-        f
-        for f in os.listdir("data/")
-        if "full" not in f and "interactions" in f and "allCharacters" not in f
-    ]
-    top_nodes = get_top_nodes(interaction_files, centrality_type="degree", top_n=3)
-    pprint(top_nodes)
+    pass

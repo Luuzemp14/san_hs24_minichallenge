@@ -25,3 +25,7 @@ def get_network_statistics(G: nx.Graph):
     print(f"Number of edges: {G.number_of_edges()}")
     print(f"Network density: {nx.density(G):.3f}")
     print(f"Average clustering coefficient: {nx.average_clustering(G):.3f}")
+
+
+def get_graph_from_file(file: str):
+    return get_graph_with_nodes_and_edges(nx.Graph(), load_json(f"data/{file}"))
