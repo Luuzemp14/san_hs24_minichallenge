@@ -1,0 +1,26 @@
+{
+  "1": {
+    "Affiliation": "Prequel Trilogy Characters: Includes key figures from Episodes I-III, such as Jedi (e.g., Yoda, Mace Windu), Sith (e.g., Darth Maul, Count Dooku), and political leaders (e.g., Padmé Amidala, Emperor Palpatine).",
+    "Potential Communication Channels": "Disrupting channels within the Galactic Senate and Jedi Council communications could impede coordination among these influential figures."
+  },
+  "2": {
+    "Affiliation": "Lars Family: Guardians of Luke Skywalker on Tatooine.",
+    "Potential Communication Channels": "Targeting local communication networks on Tatooine may isolate this family, though their impact on the larger conflict is minimal."
+  },
+  "3": {
+    "Affiliation": "Imperial Forces and Bounty Hunters: Central to the Galactic Empire's military operations and enforcement.",
+    "Potential Communication Channels": "Interfering with Imperial command channels and bounty hunter contracts could create disarray within the Empire's enforcement mechanisms."
+  },
+  "4": {
+    "Affiliation": "Rebel Pilots and Leaders: Key players in the Rebel Alliance's military efforts against the Empire.",
+    "Potential Communication Channels": "Disrupting Rebel Alliance communication networks could hinder their strategic planning and execution of missions."
+  },
+  "5": {
+    "Affiliation": "Original Trilogy Main Characters: Central heroes and leaders in the fight against the Empire during Episodes IV-VI.",
+    "Potential Communication Channels": "Targeting the Millennium Falcon's communication systems and Rebel leadership channels could impede their ability to coordinate and inspire resistance efforts."
+  },
+  "6": {
+    "Affiliation": "Sequel Trilogy Characters: Figures from Episodes VII-IX, including members of the Resistance and the First Order.",
+    "Potential Communication Channels": "Disrupting First Order command communications and Resistance networks could weaken both factions' operational capabilities."
+  }
+}

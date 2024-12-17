@@ -587,7 +587,7 @@ def plot_top_nodes(top_nodes, title, ax=None):
 
 def plot_top_nodes_by_community(file_path, centrality_type="betweenness", top_n=3):
     G_interactions = utils.get_graph_from_file(file_path)
-    communities_list = communities.get_louvain_communities(G_interactions)
+    communities_list = communities.get_louvain_communities(file_path)
 
     fig, axes = plt.subplots(2, 3, figsize=(18, 12))
     axes = axes.flatten()
@@ -611,7 +611,7 @@ def plot_top_nodes_by_community(file_path, centrality_type="betweenness", top_n=
 
 def plot_louvain_communities(file_path):
     G = utils.get_graph_from_file(file_path)
-    louvain_communities_result = communities.get_louvain_communities(G)
+    louvain_communities_result = communities.get_louvain_communities(file_path)
     num_louvain_communities = len(louvain_communities_result)
     distinct_colors = [
         plt.cm.tab20(i / num_louvain_communities)
@@ -649,4 +649,4 @@ def plot_louvain_communities(file_path):
 
 
 if __name__ == "__main__":
-    plot_louvain_communities("starwars-full-interactions-allCharacters.json")
+    pass

@@ -56,8 +56,4 @@ def get_spearman_and_pearson_correlations(graph):
     }
 
 if __name__ == "__main__":  
-    centrality_types = ["closeness", "degree", "betweenness", "eigenvector"]
-    interactions: dict = utils.load_json("data/starwars-full-interactions.json")
-    G = nx.Graph(name="Interactions")
-    G = utils.get_graph_with_nodes_and_edges(G, interactions)
-    
+    pass
