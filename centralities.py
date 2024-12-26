@@ -63,10 +63,4 @@ def plot_venn_diagram(G: nx.Graph, centrality_types: List[str]):
     plt.show()
 
 if __name__ == "__main__":
-    centrality_types = ["closeness", "degree", "betweenness", "eigenvector"]
-    interactions: dict = utils.load_json("data/starwars-full-interactions.json")
-    G_interactions = nx.Graph(name="Interactions")
-    G_interactions = utils.get_graph_with_nodes_and_edges(G_interactions, interactions)
-    for centrality_type in centrality_types:
-        print_actor_centrality(G_interactions, centrality_type)
-    plot_venn_diagram(G_interactions, centrality_types)
+    pass
