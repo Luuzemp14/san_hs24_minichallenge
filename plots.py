@@ -585,6 +585,19 @@ def plot_top_nodes(top_nodes, title, ax=None):
     return ax
 
 
+def plot_top_nodes_by_file(file_path, centrality_type="betweenness", top_n=3):
+    G = utils.get_graph_from_file(file_path)
+    top_nodes = importance.get_top_nodes_by_graph(
+        G, centrality_type=centrality_type, top_n=top_n
+    )
+    plot_top_nodes(
+        top_nodes,
+        f"Top {top_n} Nodes by {centrality_type.capitalize()} Centrality",
+        ax=None,
+    )
+    plt.show()
+
+
 def plot_top_nodes_by_community(file_path, centrality_type="betweenness", top_n=3):
     G_interactions = utils.get_graph_from_file(file_path)
     communities_list = communities.get_louvain_communities(file_path)
