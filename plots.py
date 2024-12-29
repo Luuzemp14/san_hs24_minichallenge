@@ -578,7 +578,7 @@ def plot_top_nodes(top_nodes, title, ax=None):
     nodes, values = zip(*top_nodes)
     ax.bar(nodes, values)
     ax.set_title(title)
-    ax.set_ylabel("Betweenness Centrality")
+    ax.set_ylabel("Centrality")
     ax.set_xlabel("Character")
     ax.tick_params(axis="x", rotation=45)
 
