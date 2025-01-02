@@ -1,0 +1,13 @@
+# Netzwerk-Analyse
+networkx==2.8.8
+
+# Visualisierung
+matplotlib==3.5.0
+seaborn==0.11.0
+
+# Datenverarbeitung
+pandas==1.3.0
+
+# Optional: Falls du das Paket "plots" wirklich aus PyPI verwendest.
+# Wenn "plots" ein eigenes Modul ist, brauchst du es hier nicht aufzuführen.
+plots==0.4.0
